@@ -112,14 +112,24 @@ class AmfphpCustomClassConverter {
         if (isset($obj->$explicitTypeField)) {
             $customClassName = $obj->$explicitTypeField;
             if (!class_exists($customClassName, false)) {
-                foreach ($this->customClassFolderPaths as $folderPath) {
-                    $customClassPath = $folderPath . '/' . $customClassName . '.php';
-                    if (file_exists($customClassPath)) {
-                        require_once $customClassPath;
-                        break;
-                    }
-                }
+				
+				if (!class_exists($customClassName, false)) {
+					foreach ($this->customClassFolderPaths as $folderPath) {
+						$customClassPath = $folderPath . '/' . $customClassName . '.php';
+						if (file_exists($customClassPath)) {
+							require_once $customClassPath;
+							break;
+						}
+					}
+				}
             }
+			
+			//Fix for namespace checking of $classname
+			$namespaceCustomClassName = str_replace('.', '\\', $customClassName);
+			if (class_exists($namespaceCustomClassName, false)) {
+				$customClassName = $namespaceCustomClassName;
+			}
+			
             if (class_exists($customClassName, false)) {
                 //class is available. Use it!
                 $typedObj = new $customClassName();
