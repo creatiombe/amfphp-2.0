@@ -111,6 +111,13 @@ class AmfphpCustomClassConverter {
         $explicitTypeField = Amfphp_Core_Amf_Constants::FIELD_EXPLICIT_TYPE;
         if (isset($obj->$explicitTypeField)) {
             $customClassName = $obj->$explicitTypeField;
+			
+			//Fix for namespace checking of $classname
+			$namespaceCustomClassName = str_replace('.', '\\', $customClassName);
+			if (class_exists($namespaceCustomClassName, false)) {
+				$customClassName = $namespaceCustomClassName;
+			}
+			
             if (!class_exists($customClassName, false)) {
 				
 				if (!class_exists($customClassName, false)) {
@@ -123,12 +130,6 @@ class AmfphpCustomClassConverter {
 					}
 				}
             }
-			
-			//Fix for namespace checking of $classname
-			$namespaceCustomClassName = str_replace('.', '\\', $customClassName);
-			if (class_exists($namespaceCustomClassName, false)) {
-				$customClassName = $namespaceCustomClassName;
-			}
 			
             if (class_exists($customClassName, false)) {
                 //class is available. Use it!
